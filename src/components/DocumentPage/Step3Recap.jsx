@@ -33,6 +33,7 @@ export default function Step3Recap({
           <Typography>
             <strong>Nature :</strong> {nature || "-"}
           </Typography>
+          {/* Affiche le type de pièces global seulement pour solde */}
           {type === "solde" && (
             <Typography>
               <strong>Type de pièces :</strong> {pieceType || "-"}
@@ -59,6 +60,13 @@ export default function Step3Recap({
               {titreBloc.titre && (
                 <Typography variant="subtitle1" fontWeight={600} mb={1}>
                   {`Titre ${tIdx + 1}: ${titreBloc.titre}`}
+                </Typography>
+              )}
+
+              {/* Affiche le type de pièce pour chaque titre si solde */}
+              {type === "solde" && (
+                <Typography variant="body2" color="text.secondary" mb={1}>
+                  <strong>Type de pièces :</strong> {titreBloc.pieceType || "-"}
                 </Typography>
               )}
 

@@ -1,0 +1,254 @@
+[
+  {
+    "n_service": 1,
+    "nom_service": "ANALANJIROFO",
+    "telephone": "0345990587",
+    "type": 1
+  },
+  {
+    "n_service": 2,
+    "nom_service": "ANOSY",
+    "telephone": "0345991350",
+    "type": 1
+  },
+  {
+    "n_service": 3,
+    "nom_service": "BOENY",
+    "telephone": "0345991449",
+    "type": 1
+  },
+  {
+    "n_service": 4,
+    "nom_service": "AMORON'I MANIA",
+    "telephone": "0345991874",
+    "type": 1
+  },
+  {
+    "n_service": 5,
+    "nom_service": "BETSIBOKA",
+    "telephone": "0345991952",
+    "type": 1
+  },
+  {
+    "n_service": 6,
+    "nom_service": "MENABE",
+    "telephone": "0345992334",
+    "type": 1
+  },
+  {
+    "n_service": 7,
+    "nom_service": "ITASY",
+    "telephone": "0345992590",
+    "type": 1
+  },
+  {
+    "n_service": 8,
+    "nom_service": "ATSIMO ATSINANANA",
+    "telephone": "0345992878",
+    "type": 1
+  },
+  {
+    "n_service": 9,
+    "nom_service": "IHOROMBE",
+    "telephone": "0345992980",
+    "type": 1
+  },
+  {
+    "n_service": 10,
+    "nom_service": "DIANA",
+    "telephone": "0345993069",
+    "type": 1
+  },
+  {
+    "n_service": 11,
+    "nom_service": "VAKINAKARATRA",
+    "telephone": "0345993103",
+    "type": 1
+  },
+  {
+    "n_service": 12,
+    "nom_service": "MELAKY",
+    "telephone": "0345993960",
+    "type": 1
+  },
+  {
+    "n_service": 13,
+    "nom_service": "ATSINANANA",
+    "telephone": "0345994266",
+    "type": 1
+  },
+  {
+    "n_service": 14,
+    "nom_service": "ANDROY",
+    "telephone": "0345994964",
+    "type": 1
+  },
+  {
+    "n_service": 15,
+    "nom_service": "SAVA",
+    "telephone": "0345995362",
+    "type": 1
+  },
+  {
+    "n_service": 16,
+    "nom_service": "ALAOTRA MANGORO",
+    "telephone": "0345995405",
+    "type": 1
+  },
+  {
+    "n_service": 17,
+    "nom_service": "SOFIA",
+    "telephone": "0345996334",
+    "type": 1
+  },
+  {
+    "n_service": 18,
+    "nom_service": "V7V",
+    "telephone": "0346011567",
+    "type": 1
+  },
+  {
+    "n_service": 19,
+    "nom_service": "BONGOLAVA",
+    "telephone": "0346006103",
+    "type": 1
+  },
+  {
+    "n_service": 20,
+    "nom_service": "HAUTE MATSIATRA",
+    "telephone": "0346006026",
+    "type": 1
+  },
+  {
+    "n_service": 21,
+    "nom_service": "ATSIMO ANDREFANA",
+    "telephone": "0346005951",
+    "type": 1
+  },
+  {
+    "n_service": 22,
+    "nom_service": "Antalaha",
+    "telephone": "0346004953",
+    "type": 2
+  },
+  {
+    "n_service": 23,
+    "nom_service": "Tsaratanana Nord",
+    "telephone": "0346004460",
+    "type": 2
+  },
+  {
+    "n_service": 24,
+    "nom_service": "Brickaville",
+    "telephone": "0346004049",
+    "type": 2
+  },
+  {
+    "n_service": 25,
+    "nom_service": "Fenoarivobe",
+    "telephone": "0346003791",
+    "type": 2
+  },
+  {
+    "n_service": 26,
+    "nom_service": "Maroantsetra",
+    "telephone": "0346003725",
+    "type": 2
+  },
+  {
+    "n_service": 27,
+    "nom_service": "Nosy Be",
+    "telephone": "0346003631",
+    "type": 2
+  },
+  {
+    "n_service": 28,
+    "nom_service": "Mandritsara",
+    "telephone": "0346003464",
+    "type": 2
+  },
+  {
+    "n_service": 29,
+    "nom_service": "Mahanoro",
+    "telephone": "0346003447",
+    "type": 2
+  },
+  {
+    "n_service": 30,
+    "nom_service": "Moramanga",
+    "telephone": "0346003219",
+    "type": 2
+  },
+  {
+    "n_service": 31,
+    "nom_service": "Ambatofinandrahana",
+    "telephone": "0346003109",
+    "type": 2
+  },
+  {
+    "n_service": 32,
+    "nom_service": "Mananjary",
+    "telephone": "0346002952",
+    "type": 2
+  },
+  {
+    "n_service": 33,
+    "nom_service": "Beloha",
+    "telephone": "0346002913",
+    "type": 2
+  },
+  {
+    "n_service": 34,
+    "nom_service": "Betroka",
+    "telephone": "0346002852",
+    "type": 2
+  },
+  {
+    "n_service": 35,
+    "nom_service": "Bekily",
+    "telephone": "0346002711",
+    "type": 2
+  },
+  {
+    "n_service": 37,
+    "nom_service": "Service de Mandatement de la Solde Analamanga",
+    "telephone": "034 60 191 76",
+    "type": 3
+  },
+  {
+    "n_service": 38,
+    "nom_service": "Service Central de la Solde",
+    "telephone": "034 60 176 52",
+    "type": 3
+  },
+  {
+    "n_service": 39,
+    "nom_service": "Service de la Validation des Services Précaires",
+    "telephone": "034 60 159 78",
+    "type": 3
+  },
+  {
+    "n_service": 40,
+    "nom_service": "Service Central de la  Prévoyance des Agents de l'Etat",
+    "telephone": "034 60 152 39",
+    "type": 3
+  },
+  {
+    "n_service": 41,
+    "nom_service": "Service de la Liquidation des Pensions",
+    "telephone": "034 60 150 58",
+    "type": 3
+  },
+  {
+    "n_service": 42,
+    "nom_service": "Service de l'Ordonnancement des Dépenses des Pensions",
+    "telephone": "034 60 146 68",
+    "type": 3
+  },
+  {
+    "n_service": 43,
+    "nom_service": "Service des Secours Décès et des Oppositions",
+    "telephone": "034 60 146 14",
+    "type": 3
+  }
+]

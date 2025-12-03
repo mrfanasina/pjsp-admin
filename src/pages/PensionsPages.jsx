@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
-  Snackbar,
   Typography,
   Stack,
   Paper,
@@ -15,26 +14,50 @@ import {
   CircularProgress,
   Skeleton,
 } from "@mui/material";
+
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DescriptionIcon from "@mui/icons-material/Description";
-import DocumentPage from "../components/DocumentPage/index.jsx";
-import { deleteDocument, getPensionsDocuments, updateDocument } from "../services/solde.js";
-import { showConfirm, showToast, showToastErr } from "../utils/alerts.js";
 import { Delete, Edit } from "@mui/icons-material";
+
+import DocumentPage from "../components/DocumentPage/index.jsx";
+
+import {
+  deleteDocument,
+  getPensionsDocuments,
+  updateDocument,
+} from "../services/solde.js";
+
+import { showConfirm, showToast, showToastErr } from "../utils/alerts.js";
+import { useHeaderVisibility } from "../contexts/HeaderVisibilityContext.jsx";
+import { useSearch } from "../contexts/SearchContext";
+
+// Normalisation pour "reference"
+const normalizeRefs = (ref) => {
+  if (Array.isArray(ref)) return ref;
+  if (!ref) return [];
+  return [ref];
+};
 
 export default function PensionsPage() {
   const [documents, setDocuments] = useState([]);
+  const [filteredDocs, setFilteredDocs] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [toast, setToast] = useState("");
   const [deletingId, setDeletingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedUpdateDoc, setSelectedUpdateDoc] = useState(null);
+  const [references, setReferences] = useState([]);
 
-  const references = [
-    { id: "solde-123", label: "Solde N°12345" },
-    { id: "solde-124", label: "Solde N°12458" },
-  ];
+  // 🔥 Debounced search (exactement comme Solde)
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const { search } = useSearch();
+
+  const { setShowHeader } = useHeaderVisibility();
+
+  useEffect(() => {
+    setShowHeader(!showForm);
+    return () => setShowHeader(true);
+  }, [showForm]);
 
   const handleAddClick = () => setShowForm(true);
 
@@ -43,18 +66,26 @@ export default function PensionsPage() {
     setSelectedUpdateDoc(null);
   };
 
+  // ------------------------------
+  // 🔥 SUBMIT FORM
+  // ------------------------------
   const handleSubmit = async (data, mode) => {
+    data.reference = normalizeRefs(data.reference);
+
     if (mode === "update") {
       try {
         await updateDocument(data.id, data);
+
         setDocuments((prev) =>
           prev.map((d) => (d.id === data.id ? { ...d, ...data } : d))
         );
-        setToast("✅ Document modifié avec succès");
+
+        showToast("Document modifié avec succès", "success");
       } catch (err) {
         console.error(err);
-        setToast("❌ Erreur lors de la modification");
+        showToastErr("Erreur lors de la modification");
       }
+
       setShowForm(false);
       setSelectedUpdateDoc(null);
       return;
@@ -63,11 +94,18 @@ export default function PensionsPage() {
     // CREATE
     try {
       const docs = await getPensionsDocuments();
-      setDocuments(docs);
-      setToast("✅ Document enregistré avec succès");
+
+      const cleaned = docs.map((d) => ({
+        ...d,
+        id: d.id,
+        reference: normalizeRefs(d.reference),
+      }));
+
+      setDocuments(cleaned);
+      showToast("Document enregistré avec succès", "success");
     } catch (err) {
       console.error(err);
-      setToast("❌ Erreur lors de l'enregistrement");
+      showToastErr("Erreur lors de l'enregistrement");
     }
 
     setShowForm(false);
@@ -84,16 +122,14 @@ export default function PensionsPage() {
       if (!confirm) return;
 
       setDeletingId(docId);
-
       await deleteDocument(docId);
 
       setDocuments((prev) => prev.filter((d) => d.id !== docId));
 
-      // ⚠️ IMPORTANT : surtout ne pas faire "await showToast"
       showToast("Document supprimé avec succès", "success");
     } catch (err) {
       console.error(err);
-      showToastErr("❌ Impossible de supprimer le document");
+      showToastErr("Impossible de supprimer le document");
     } finally {
       setDeletingId(null);
     }
@@ -101,26 +137,48 @@ export default function PensionsPage() {
 
   const handleUpdate = (docId) => {
     const doc = documents.find((d) => d.id === docId);
-    setSelectedUpdateDoc(doc);
+
+    const fixed = {
+      ...doc,
+      reference: normalizeRefs(doc.reference),
+    };
+
+    setSelectedUpdateDoc(fixed);
     setShowForm(true);
   };
 
+  // ------------------------------
+  // 🔥 LOAD DOCUMENTS
+  // ------------------------------
   useEffect(() => {
     const fetchDocs = async () => {
       setLoading(true);
       try {
         const docs = await getPensionsDocuments();
 
-        // SÉCURITÉ : garantir un ID unique pour éviter le bug du bouton "Suppression..."
         const cleanDocs = docs.map((d) => ({
           ...d,
-          id: d.id || crypto.randomUUID(),
+          id: d.id,
+          reference: normalizeRefs(d.reference),
         }));
 
         setDocuments(cleanDocs);
+
+        // Récupération des références
+        let refs = [];
+        cleanDocs.forEach((doc) => refs.push(...normalizeRefs(doc.reference)));
+
+        refs = [...new Set(refs.filter((e) => e && e.trim() !== ""))];
+
+        setReferences(
+          refs.map((r) => ({
+            id: crypto.randomUUID(),
+            label: r,
+          }))
+        );
       } catch (err) {
         console.error(err);
-        setToast("❌ Erreur lors du chargement des documents");
+        showToastErr("Erreur lors du chargement des documents");
       } finally {
         setLoading(false);
       }
@@ -129,6 +187,59 @@ export default function PensionsPage() {
     fetchDocs();
   }, []);
 
+  // ------------------------------
+  // 🔥 Debounce (300 ms)
+  // ------------------------------
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // ------------------------------
+  // 🔥 SEARCH FILTER (identique à Solde)
+  // ------------------------------
+  useEffect(() => {
+    if (!debouncedSearch) {
+      setFilteredDocs(documents);
+      return;
+    }
+
+    const term = debouncedSearch.toLowerCase();
+
+    const filtered = documents.filter((doc) => {
+      if (doc.nature?.toLowerCase().includes(term)) return true;
+
+      if (doc.reference.some((r) => r.toLowerCase().includes(term))) return true;
+
+      if (doc.titres?.length > 0) {
+        for (const t of doc.titres) {
+          if (t.titre?.toLowerCase().includes(term)) return true;
+
+          if (t.pieceType?.toLowerCase().includes(term)) return true;
+
+          if (t.sousTitres?.length > 0) {
+            for (const st of t.sousTitres) {
+              if (st.sousTitre?.toLowerCase().includes(term)) return true;
+
+              if (st.pieces?.some((p) => p.toLowerCase().includes(term)))
+                return true;
+            }
+          }
+        }
+      }
+
+      return false;
+    });
+
+    setFilteredDocs(filtered);
+  }, [debouncedSearch, documents]);
+
+  // ------------------------------
+  // 🔥 Skeleton
+  // ------------------------------
   const renderSkeleton = () => (
     <Stack spacing={2}>
       {[1, 2, 3].map((i) => (
@@ -140,20 +251,6 @@ export default function PensionsPage() {
               <Skeleton variant="text" width="40%" height={20} />
             </Box>
           </Stack>
-          <Box mt={2}>
-            <Skeleton variant="text" width="80%" height={20} />
-            <Skeleton variant="text" width="70%" height={20} />
-            <Skeleton
-              variant="rectangular"
-              width="100%"
-              height={40}
-              sx={{ mt: 1, borderRadius: 1 }}
-            />
-          </Box>
-          <Stack direction="row" spacing={1} mt={2} justifyContent="flex-end">
-            <Skeleton variant="rectangular" width={80} height={30} />
-            <Skeleton variant="rectangular" width={80} height={30} />
-          </Stack>
         </Card>
       ))}
     </Stack>
@@ -161,7 +258,7 @@ export default function PensionsPage() {
 
   return (
     <Fade in timeout={400}>
-      <Box sx={{ width: "100%", px: 2 }}>
+      <Box sx={{ p: 0 }}>
         {showForm ? (
           <>
             <Stack direction="row" spacing={1} mb={2} alignItems="center">
@@ -172,19 +269,19 @@ export default function PensionsPage() {
               </Tooltip>
 
               <Typography variant="h5">
-                {selectedUpdateDoc ? "Modifier le document de pensions" : "Nouveau document de pensions"}
+                {selectedUpdateDoc
+                  ? "Modifier un document de pensions"
+                  : "Nouveau document de pensions"}
               </Typography>
             </Stack>
 
-            <Paper elevation={2} sx={{ p: 3 }}>
-              <DocumentPage
-                initialType="pension"
-                references={references}
-                onSubmit={handleSubmit}
-                onCancel={handleCancel}
-                updateDoc={selectedUpdateDoc}
-              />
-            </Paper>
+            <DocumentPage
+              initialType="pension"
+              references={references}
+              onSubmit={handleSubmit}
+              onCancel={handleCancel}
+              updateDoc={selectedUpdateDoc}
+            />
           </>
         ) : (
           <>
@@ -195,7 +292,9 @@ export default function PensionsPage() {
               mb={3}
               spacing={2}
             >
-              <Typography variant="h4">Gestion des documents de pensions</Typography>
+              <Typography variant="h4">
+                Gestion des documents de pensions
+              </Typography>
 
               <Button
                 variant="contained"
@@ -209,13 +308,13 @@ export default function PensionsPage() {
 
             {loading ? (
               renderSkeleton()
-            ) : documents.length === 0 ? (
+            ) : filteredDocs.length === 0 ? (
               <Paper sx={{ p: 3, textAlign: "center", color: "text.secondary" }}>
-                <Typography>Aucun document enregistré.</Typography>
+                <Typography>Aucun document trouvé.</Typography>
               </Paper>
             ) : (
               <Stack spacing={2}>
-                {documents.map((doc) => (
+                {filteredDocs.map((doc) => (
                   <Card key={doc.id} variant="outlined" sx={{ borderRadius: 2 }}>
                     <CardContent>
                       <Stack direction="row" spacing={2} alignItems="center">
@@ -225,14 +324,32 @@ export default function PensionsPage() {
 
                       {doc.titres?.length > 0 && (
                         <Box mt={2}>
-                          {doc.titres.map((t, i) => (
-                            <Box key={i} mb={1}>
-                              {t.titre && <Typography fontWeight={600}>• {t.titre}</Typography>}
-                              {t.sousTitres?.map((st, j) => (
-                                <Box key={j} ml={2}>
-                                  {st.sousTitre && <Typography>- {st.sousTitre}</Typography>}
-                                  {st.pieces?.map((p, k) => (
-                                    <Typography key={k} variant="body2" ml={3}>
+                          {doc.titres.map((t, ti) => (
+                            <Box key={ti} mb={1}>
+                              {t.titre && (
+                                <Typography fontWeight={600}>
+                                  • {t.titre}
+                                </Typography>
+                              )}
+
+                              {t.pieceType && (
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                  ml={2}
+                                >
+                                  <strong>Type de pièces :</strong>{" "}
+                                  {t.pieceType}
+                                </Typography>
+                              )}
+
+                              {t.sousTitres?.map((st, si) => (
+                                <Box key={si} ml={2}>
+                                  {st.sousTitre && (
+                                    <Typography>- {st.sousTitre}</Typography>
+                                  )}
+                                  {st.pieces?.map((p, pi) => (
+                                    <Typography key={pi} variant="body2" ml={3}>
                                       • {p}
                                     </Typography>
                                   ))}
@@ -244,7 +361,10 @@ export default function PensionsPage() {
                       )}
 
                       <Typography variant="body2" color="text.secondary" mt={1}>
-                        <strong>Référence :</strong> {doc.reference || "—"}
+                        <strong>Références :</strong>{" "}
+                        {doc.reference.length > 0
+                          ? doc.reference.join(", ")
+                          : "—"}
                       </Typography>
                     </CardContent>
 

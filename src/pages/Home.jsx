@@ -1,88 +1,72 @@
-import * as React from "react";
-import PropTypes from "prop-types";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Avatar from "@mui/material/Avatar";
-import { createTheme } from "@mui/material/styles";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import { AppProvider } from "@toolpad/core/AppProvider";
-import { DashboardLayout } from "@toolpad/core/DashboardLayout";
-import { DemoProvider, useDemoRouter } from "@toolpad/core/internal";
-import { useAuth } from "../contexts/AuthContext";
-import { AccountBalance, Article, AttachMoney, Dashboard, People, Rule, Settings } from "@mui/icons-material";
-import SoldesPage from "./SoldesPage";
-import PensionsPage from "./PensionsPages";
-import ParametresPage from "./ParametresPage";
-import ServicesPage from "./ServicesPage";
-import ArticlesPage from "./ArticlesPage";
+import React, { useState } from 'react';
+import { Outlet, Navigate, useLocation, Routes, Route } from 'react-router-dom';
+import Sidebar from './Sidebar';
+import Header from './Sidebar';
+import { useUser } from '../contexts/AuthContext';
+import SoldesPage from '../pages/SoldesPage';
+import PensionsPage from '../pages/PensionsPages';
+import ArticlesPage from '../pages/ArticlesPage';
+import ServicesPage from '../pages/ServicesPage';
+import ParametresPage from '../pages/ParametresPage';
+import MessagePage from '../pages/MessagePage';
+import DashboardHome from '../pages/DashboardHome';
 
-
-const NAVIGATION = [
-  { segment: "soldes", title: "Soldes", icon: <AttachMoney /> },
-  { segment: "pensions", title: "Pensions", icon: <AccountBalance /> },
-  { segment: "parametres", title: "Paramètres", icon: <Settings /> },
-  { segment: "articles", title: "Articles", icon:  <Article/> },
-  { segment: "services", title: "Services", icon: <People /> },
-];
-
-
-const demoTheme = createTheme({
-  cssVariables: {
-    colorSchemeSelector: "data-toolpad-color-scheme",
-  },
-  colorSchemes: { light: true, dark: true },
-  breakpoints: {
-    values: {
-      xs: 0,
-      sm: 600,
-      md: 600,
-      lg: 1200,
-      xl: 1536,
-    },
-  },
-});
-
-function DemoPageContent({ pathname, user }) {
-  console.log(pathname)
-  return (
-    <Box sx={{ p: 2 }}>
-      {pathname === "/soldes" && <SoldesPage user={user} />}
-      {pathname === "/pensions" && <PensionsPage user={user} />}
-      {pathname === "/services" && <ServicesPage user={user} />}
-      {pathname === "/articles" && <ArticlesPage user={user} />}
-      {pathname === "/parametres" && <ParametresPage user={user} />}
-    </Box>
-  );
-}
-
-DemoPageContent.propTypes = {
-  pathname: PropTypes.string.isRequired,
-  user: PropTypes.object,
+const routeTitles = {
+'/pjsp/dashboard': 'Accueil',
+'/pjsp/soldes': 'Soldes',
+'/pjsp/pensions': 'Pensions',
+'/pjsp/articles': 'Articles',
+'/pjsp/services': 'Services',
+'/pjsp/parametres': 'Paramètres',
+'/pjsp/messages': 'Messages',
 };
 
-function DashboardLayoutAccount(props) {
-  const { window } = props;
-  const { user } = useAuth(); // <-- récupération de l'utilisateur depuis le contexte
+const PJSPDashboardLayout = () => {
+const { user, setUser } = useUser();
+const [isSidebarOpen, setSidebarOpen] = useState(true);
+const location = useLocation();
 
-  const router = useDemoRouter("/dashboard");
-  const demoWindow = window !== undefined ? window() : undefined;
-
-  return (
-    <DemoProvider window={demoWindow}>
-      <AppProvider
-        session={{ user }}
-        authentication={{}}
-        navigation={NAVIGATION}
-        router={router}
-        theme={demoTheme}
-        window={demoWindow}
-      >
-        <DashboardLayout>
-          <DemoPageContent pathname={router.pathname} user={user} />
-        </DashboardLayout>
-      </AppProvider>
-    </DemoProvider>
-  );
+if (!user) {
+return <Navigate to="/login" replace />;
 }
 
-export default DashboardLayoutAccount;
+const handleLogout = () => {
+localStorage.removeItem('authToken');
+localStorage.removeItem('currentUser');
+sessionStorage.removeItem('authToken');
+sessionStorage.removeItem('currentUser');
+setUser(null);
+window.location.href = '/login';
+};
+
+const headerTitle = routeTitles[location.pathname] || '';
+
+return ( <div className="flex h-screen overflow-hidden">
+<Sidebar
+isOpen={isSidebarOpen}
+onToggle={() => setSidebarOpen(prev => !prev)}
+onLogout={handleLogout}
+/>
+<div
+className={`flex flex-col flex-1 bg-gray-100 transition-all duration-300 ${
+          isSidebarOpen ? 'md:ml-64' : 'md:ml-20'
+        }`}
+>
+<Header
+title={headerTitle}
+user={user}
+onToggleSidebar={() => setSidebarOpen(prev => !prev)}
+onLogout={handleLogout}
+/> <main className="p-6 flex-1 overflow-auto"> <Routes>
+<Route path="dashboard" element={<DashboardHome />} />
+<Route path="soldes" element={<SoldesPage />} />
+<Route path="pensions" element={<PensionsPage />} />
+<Route path="articles" element={<ArticlesPage />} />
+<Route path="services" element={<ServicesPage />} />
+<Route path="parametres" element={<ParametresPage />} />
+<Route path="messages" element={<MessagePage />} />
+<Route path="*" element={<DashboardHome />} /> </Routes> <Outlet /> </main> </div> </div>
+);
+};
+
+export default PJSPDashboardLayout;

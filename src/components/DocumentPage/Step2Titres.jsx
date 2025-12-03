@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Stack,
   TextField,
@@ -7,233 +7,407 @@ import {
   Paper,
   Tooltip,
   Typography,
+  Box,
+  Chip,
+  InputAdornment,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel
 } from "@mui/material";
-import { Plus, Trash } from "lucide-react";
-import { showToast, showConfirm, showAlert } from "../../utils/alerts";
+import {
+  Plus,
+  Trash,
+  X,
+  BookOpen,
+  List,
+  Check,
+  Pencil,
+} from "lucide-react";
+import { showToast, showConfirm } from "../../utils/alerts";
 
-export default function Step2Titres({ titres, setTitres }) {
-  
-  // === Ajout d’un titre ===
-  const handleAddTitre = () => {
-    setTitres((prev) => [
-      ...prev,
-      { titre: "", sousTitres: [{ sousTitre: "", pieces: [], pieceInput: "" }] },
-    ]);
-    showToast("Nouveau titre ajouté", "info");
+export default function Step2Titres({ titres, setTitres, type }) {
+  const [editingPiece, setEditingPiece] = useState(null);
+  const [editValue, setEditValue] = useState("");
+
+  const clone = (v) => structuredClone(v);
+
+  // ===========================
+  // 🔹 AJOUT NOUVEAU TITRE
+  // ===========================
+  const addTitre = () => {
+    const newTitre = {
+      id: Date.now(),
+      titre: "",
+      pieceType: type === "solde" ? "visa" : undefined,
+      sousTitres: [
+        { id: Date.now() + 1, sousTitre: "", pieces: [], pieceInput: "" },
+      ],
+    };
+    setTitres((prev) => [...(prev || []), newTitre]);
+    showToast("Titre ajouté", "info");
   };
 
-  const handleRemoveTitre = async (index) => {
-    const confirmed = await showConfirm(
+  const removeTitre = async (index) => {
+    const ok = await showConfirm(
       "Supprimer ce titre ?",
       "warning",
-      "Oui, supprimer",
-      "Tous les sous-titres et pièces seront perdus."
+      "Oui",
+      "Toutes les données seront perdues."
     );
-    if (!confirmed) return;
-    setTitres((prev) => prev.filter((_, i) => i !== index));
-    showToast("Titre supprimé", "info");
+    if (!ok) return;
+    setTitres((p) => p.filter((_, i) => i !== index));
+    showToast("Titre supprimé.", "success");
   };
 
-  const handleChangeTitre = (index, value) => {
-    const newTitres = structuredClone(titres);
-    newTitres[index].titre = value;
-    setTitres(newTitres);
+  const changeTitre = (index, value) => {
+    const list = clone(titres);
+    if (list[index]) {
+      list[index].titre = value;
+      setTitres(list);
+    }
   };
 
-  // === Ajout d’un sous-titre ===
-  const handleAddSousTitre = (titreIndex) => {
-    const newTitres = structuredClone(titres);
-    newTitres[titreIndex].sousTitres.push({
+  const changeTypePiece = (index, value) => {
+    const list = clone(titres);
+    if (list[index]) {
+      list[index].pieceType = value;
+      setTitres(list);
+    }
+  };
+
+  // Assure que tous les titres ont un pieceType par défaut
+  React.useEffect(() => {
+    if (type === "solde") {
+      const fixed = (titres || []).map(t => ({
+        ...t,
+        pieceType: t.pieceType || "visa",
+      }));
+      setTitres(fixed);
+    }
+  }, []);
+
+
+  // ===========================
+  // 🔹 SOUS-TITRES
+  // ===========================
+  const addSousTitre = (tidx) => {
+    const list = clone(titres);
+    list[tidx].sousTitres.push({
+      id: Date.now(),
       sousTitre: "",
       pieces: [],
       pieceInput: "",
     });
-    setTitres(newTitres);
-    showToast("Nouveau sous-titre ajouté", "info");
+    setTitres(list);
   };
 
-  const handleRemoveSousTitre = async (titreIndex, sousIndex) => {
-    const confirmed = await showConfirm(
-      "Supprimer ce sous-titre ?",
-      "warning",
-      "Oui, supprimer",
-      "Toutes les pièces associées seront perdues."
-    );
-    if (!confirmed) return;
-    const newTitres = structuredClone(titres);
-    newTitres[titreIndex].sousTitres.splice(sousIndex, 1);
-    setTitres(newTitres);
-    showToast("Sous-titre supprimé", "info");
+  const removeSousTitre = async (tidx, sidx) => {
+    const ok = await showConfirm("Supprimer ce sous-titre ?", "warning", "Oui", "Irréversible");
+    if (!ok) return;
+    const list = clone(titres);
+    list[tidx].sousTitres.splice(sidx, 1);
+    setTitres(list);
   };
 
-  const handleChangeSousTitre = (titreIndex, sousIndex, value) => {
-    const newTitres = structuredClone(titres);
-    newTitres[titreIndex].sousTitres[sousIndex].sousTitre = value;
-    setTitres(newTitres);
+  const changeSousTitre = (tidx, sidx, val) => {
+    const list = clone(titres);
+    list[tidx].sousTitres[sidx].sousTitre = val;
+    setTitres(list);
   };
 
-  // === Gestion des pièces ===
-  const handleAddPiece = (titreIndex, sousIndex) => {
-    const newTitres = structuredClone(titres);
-    const sous = newTitres[titreIndex].sousTitres[sousIndex];
+  // ===========================
+  // 🔹 PIÈCES
+  // ===========================
+  const addPiece = (tidx, sidx) => {
+    const list = clone(titres);
+    const st = list[tidx].sousTitres[sidx];
+    const trimmedInput = (st.pieceInput || "").trim();
+    if (!trimmedInput) return;
 
-    if (!sous.pieceInput.trim())
-      return showAlert("Erreur", "Veuillez saisir un nom de pièce", "warning");
+    if (!st.pieces) st.pieces = [];
+    if (st.pieces.includes(trimmedInput)) {
+      st.pieceInput = "";
+      setTitres(list);
+      return;
+    }
 
-    sous.pieces.push(sous.pieceInput.trim());
-    sous.pieceInput = "";
-    setTitres(newTitres);
+    st.pieces.push(trimmedInput);
+    st.pieceInput = "";
+    setTitres(list);
   };
 
-  const handleRemovePiece = async (titreIndex, sousIndex, pieceIndex) => {
-    const confirmed = await showConfirm(
-      "Supprimer cette pièce ?",
-      "warning",
-      "Oui, supprimer",
-      "Cette action est irréversible."
-    );
-    if (!confirmed) return;
-
-    const newTitres = structuredClone(titres);
-    newTitres[titreIndex].sousTitres[sousIndex].pieces.splice(pieceIndex, 1);
-    setTitres(newTitres);
-    showToast("Pièce supprimée", "info");
+  const removePiece = (tidx, sidx, pidx) => {
+    const list = clone(titres);
+    list[tidx].sousTitres[sidx].pieces.splice(pidx, 1);
+    setTitres(list);
   };
 
-  return (
-    <Stack spacing={3} sx={{ maxHeight: "70vh", overflowY: "auto" }}>
-      {titres.map((titreBloc, tIdx) => (
-        <Paper
-          key={tIdx}
-          variant="outlined"
-          sx={{ p: 2, mb: 3, backgroundColor: "grey.50" }}
-        >
-          {/* === Titre === */}
-          <Stack direction="row" spacing={1} alignItems="center" mb={2}>
-            <TextField
-              fullWidth
-              label={`Titre ${tIdx + 1}`}
-              value={titreBloc.titre}
-              onChange={(e) => handleChangeTitre(tIdx, e.target.value)}
-              size="small"
-            />
-            <Tooltip title="Supprimer le titre">
-              <IconButton
-                color="error"
-                onClick={() => handleRemoveTitre(tIdx)}
-                size="small"
-              >
-                <Trash size={18} />
-              </IconButton>
-            </Tooltip>
-          </Stack>
+  const startEditingPiece = (tIdx, sIdx, pIdx, currentValue) => {
+    setEditingPiece({ tIdx, sIdx, pIdx });
+    setEditValue(currentValue);
+  };
 
-          {/* === Sous-titres === */}
-          {titreBloc.sousTitres.map((sous, sIdx) => (
-            <Paper
-              key={sIdx}
-              variant="outlined"
-              sx={{
-                p: 2,
-                mb: 2,
-                backgroundColor: "white",
-                borderColor: "grey.300",
-              }}
-            >
-              {/* Sous-titre */}
-              <Stack direction="row" spacing={1} alignItems="center" mb={2}>
-                <TextField
-                  fullWidth
-                  label={`Sous-titre ${sIdx + 1}`}
-                  value={sous.sousTitre}
-                  onChange={(e) =>
-                    handleChangeSousTitre(tIdx, sIdx, e.target.value)
-                  }
-                  size="small"
-                />
+  const saveEditedPiece = () => {
+    if (!editingPiece) return;
+    const { tIdx, sIdx, pIdx } = editingPiece;
+    if (!editValue.trim()) {
+      setEditingPiece(null);
+      return;
+    }
+    const list = clone(titres);
+    list[tIdx].sousTitres[sIdx].pieces[pIdx] = editValue.trim();
+    setTitres(list);
+    setEditingPiece(null);
+  };
 
-                <Tooltip title="Supprimer le sous-titre">
-                  <IconButton
-                    color="error"
-                    size="small"
-                    onClick={() => handleRemoveSousTitre(tIdx, sIdx)}
-                  >
-                    <Trash size={18} />
-                  </IconButton>
-                </Tooltip>
-              </Stack>
+  const cancelEditingPiece = () => {
+    setEditingPiece(null);
+    setEditValue("");
+  };
 
-              {/* Ajouter une pièce */}
-              <Stack direction="row" spacing={1} mb={2}>
-                <TextField
-                  fullWidth
-                  label="Nouvelle pièce"
-                  value={sous.pieceInput}
-                  onChange={(e) => {
-                    const newTitres = structuredClone(titres);
-                    newTitres[tIdx].sousTitres[sIdx].pieceInput = e.target.value;
-                    setTitres(newTitres);
-                  }}
-                  size="small"
-                />
+  const handlePieceInputChange = (tidx, sidx, value) => {
+    const list = clone(titres);
+    list[tidx].sousTitres[sidx].pieceInput = value;
+    setTitres(list);
+  };
 
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  startIcon={<Plus size={16} />}
-                  onClick={() => handleAddPiece(tIdx, sIdx)}
-                >
-                  Ajouter
-                </Button>
-              </Stack>
+  const handlePieceInputKeyDown = (e, tidx, sidx) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addPiece(tidx, sidx);
+    }
+  };
 
-              {/* Liste des pièces */}
-              {sous.pieces.length > 0 && (
-                <Stack spacing={1}>
-                  {sous.pieces.map((p, pIdx) => (
-                    <Paper
-                      key={pIdx}
-                      variant="outlined"
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        px: 2,
-                        py: 1,
-                      }}
-                    >
-                      <Typography variant="body2">{p}</Typography>
+  // ===========================
+  // 🔹 RENDU SOUS-TITRE / PIÈCES
+  // ===========================
+  const renderSousTitreAndPieces = (t, tIdx, sIdx, st, color) => {
+    const piecesList = st.pieces || [];
 
-                      <Tooltip title="Supprimer la pièce">
-                        <IconButton
-                          color="error"
-                          size="small"
-                          onClick={() =>
-                            handleRemovePiece(tIdx, sIdx, pIdx)
-                          }
-                        >
-                          <Trash size={16} />
-                        </IconButton>
-                      </Tooltip>
-                    </Paper>
-                  ))}
-                </Stack>
-              )}
-            </Paper>
-          ))}
+    return (
+      <Box
+        key={st.id}
+        sx={{
+          p: 2,
+          mt: 2,
+          background: color,
+          borderRadius: 1,
+          border: "1px dashed #ccc",
+        }}
+      >
+        <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+          <List size={20} color="gray" />
+          <TextField
+            fullWidth
+            size="small"
+            label={`Sous-titre ${sIdx + 1}`}
+            value={st.sousTitre || ""}
+            onChange={(e) => changeSousTitre(tIdx, sIdx, e.target.value)}
+          />
+          <Tooltip title="Supprimer ce sous-titre">
+            <IconButton color="error" onClick={() => removeSousTitre(tIdx, sIdx)}>
+              <Trash size={20} />
+            </IconButton>
+          </Tooltip>
+        </Stack>
 
+        <Stack direction="row" spacing={1} mt={2}>
+          <TextField
+            fullWidth
+            size="small"
+            label="Nouvelle pièce justificative"
+            placeholder="Nom de la pièce + Entrée"
+            value={st.pieceInput || ""}
+            onChange={(e) => handlePieceInputChange(tIdx, sIdx, e.target.value)}
+            onBlur={() => addPiece(tIdx, sIdx)}
+            onKeyDown={(e) => handlePieceInputKeyDown(e, tIdx, sIdx)}
+          />
           <Button
             variant="contained"
             startIcon={<Plus />}
-            onClick={() => handleAddSousTitre(tIdx)}
+            onClick={() => addPiece(tIdx, sIdx)}
+            sx={{ minWidth: 100 }}
           >
-            Ajouter un sous-titre
+            Ajouter
           </Button>
-        </Paper>
-      ))}
+        </Stack>
 
-      <Button variant="outlined" startIcon={<Plus />} onClick={handleAddTitre}>
-        Ajouter un nouveau titre
+        {piecesList.length > 0 && (
+          <Box
+            mt={2}
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 1,
+              p: 1.5,
+              border: "1px solid #ddd",
+              borderRadius: 1,
+              bgcolor: "white",
+            }}
+          >
+            <Typography variant="caption" sx={{ color: "text.secondary", width: "100%", mb: 0.5 }}>
+              Pièces (Cliquez sur une pièce pour la modifier) :
+            </Typography>
+
+            {piecesList.map((p, pIdx) => {
+              const isEditing =
+                editingPiece?.tIdx === tIdx &&
+                editingPiece?.sIdx === sIdx &&
+                editingPiece?.pIdx === pIdx;
+
+              if (isEditing) {
+                return (
+                  <TextField
+                    key={pIdx}
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onBlur={saveEditedPiece}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") saveEditedPiece();
+                      if (e.key === "Escape") cancelEditingPiece();
+                    }}
+                    autoFocus
+                    size="small"
+                    sx={{ minWidth: 200 }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton size="small" onClick={saveEditedPiece} color="primary">
+                            <Check size={16} />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                );
+              }
+
+              return (
+                <Tooltip key={pIdx} title="Cliquer pour modifier" arrow>
+                  <Chip
+                    label={p}
+                    variant="outlined"
+                    onClick={() => startEditingPiece(tIdx, sIdx, pIdx, p)}
+                    onDelete={(e) => {
+                      e.stopPropagation();
+                      removePiece(tIdx, sIdx, pIdx);
+                    }}
+                    deleteIcon={<X size={16} />}
+                    icon={<Pencil size={12} style={{ opacity: 0.5 }} />}
+                    sx={{
+                      fontWeight: "medium",
+                      cursor: "text",
+                      "&:hover": { bgcolor: "#f5f5f5", borderColor: "primary.main" },
+                    }}
+                  />
+                </Tooltip>
+              );
+            })}
+          </Box>
+        )}
+      </Box>
+    );
+  };
+
+  // ===========================
+  // 🔹 RENDU TITRE
+  // ===========================
+  const renderTitre = (t, tIdx) => {
+    const sousTitresSafe = t.sousTitres || [];
+
+    return (
+      <Paper key={t.id} sx={{ p: 3, background: "#EAF6FF", boxShadow: 3, borderRadius: 2 }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Stack direction="row" spacing={1} alignItems="center">
+            <BookOpen size={24} color="#333" />
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              Titre {tIdx + 1}
+            </Typography>
+          </Stack>
+          <Tooltip title="Supprimer ce Titre">
+            <Button
+              color="error"
+              startIcon={<Trash />}
+              size="small"
+              onClick={() => removeTitre(tIdx)}
+              variant="outlined"
+            >
+              Supprimer
+            </Button>
+          </Tooltip>
+        </Stack>
+
+        <Stack direction="row" spacing={2} mt={2} alignItems="center">
+          <TextField
+            fullWidth
+            label="Intitulé du Titre"
+            size="small"
+            value={t.titre || ""}
+            onChange={(e) => changeTitre(tIdx, e.target.value)}
+          />
+          {type === "solde" && (
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <InputLabel>Type</InputLabel>
+              <Select
+                value={t.pieceType || "visa"}
+                label="Type"
+                onChange={(e) => changeTypePiece(tIdx, e.target.value)}
+              >
+                <MenuItem value="visa">Visa</MenuItem>
+                <MenuItem value="mandatement">Mandatement</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+        </Stack>
+
+        <Typography
+          variant="subtitle1"
+          sx={{ mt: 3, mb: 1, fontWeight: "bold", borderBottom: "1px solid #ddd", pb: 0.5 }}
+        >
+          Détails / Sous-Titres
+        </Typography>
+
+        {sousTitresSafe.map((st, sIdx) =>
+          renderSousTitreAndPieces(t, tIdx, sIdx, st, "#F8FBFF")
+        )}
+
+        <Button
+          startIcon={<Plus />}
+          sx={{ mt: 2 }}
+          onClick={() => addSousTitre(tIdx)}
+          variant="text"
+          size="small"
+        >
+          Ajouter un Sous-Titre
+        </Button>
+      </Paper>
+    );
+  };
+
+  return (
+    <Stack spacing={4}>
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{ borderBottom: "2px solid #3f51b5", pb: 1 }}
+      >
+        Gestion des Pièces Justificatives
+      </Typography>
+      <Typography variant="body1" color="text.secondary" gutterBottom>
+        Organisez les pièces justificatives par Titre (catégorie principale) et
+        Sous-Titre (détail).
+      </Typography>
+
+      {(titres || []).map((t, tIdx) => renderTitre(t, tIdx))}
+
+      <Button
+        variant="contained"
+        startIcon={<Plus />}
+        onClick={addTitre}
+        sx={{ mt: 2 }}
+      >
+        Ajouter un nouveau Titre
       </Button>
     </Stack>
   );

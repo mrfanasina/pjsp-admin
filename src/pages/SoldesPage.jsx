@@ -7,12 +7,12 @@ import {
   Paper,
   Fade,
   IconButton,
-  Tooltip,
   Card,
   CardContent,
   CardActions,
   CircularProgress,
   Skeleton,
+  Tooltip,
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
@@ -24,6 +24,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DocumentPage from "../components/DocumentPage/index.jsx";
 import { deleteDocument, getSoldeDocuments, updateDocument } from "../services/solde.js";
 import { showConfirm, showToast, showToastErr } from "../utils/alerts.js";
+import { useHeaderVisibility } from "../contexts/HeaderVisibilityContext.jsx";
+import { useSearch } from "../contexts/SearchContext";
 
 export default function SoldesPage() {
   const [documents, setDocuments] = useState([]);
@@ -31,12 +33,34 @@ export default function SoldesPage() {
   const [deletingId, setDeletingId] = useState(null);
   const [selectedUpdateDoc, setSelectedUpdateDoc] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState("");
+  const [references, setReferences] = useState([]);
+  const [filteredDocs, setFilteredDocs] = useState([]);
 
-  const references = [
-    { id: "solde-123", label: "Solde N°12345" },
-    { id: "solde-124", label: "Solde N°12458" },
-  ];
+  // 🔥 Ajout pour supprimer l'input lag
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  const { setShowHeader } = useHeaderVisibility();
+  const { search } = useSearch();
+
+  useEffect(() => {
+    setShowHeader(!showForm);
+    return () => setShowHeader(true);
+  }, [showForm]);
+  useEffect(() => {
+  const fetchDocs = async () => {
+    const docs = await getSoldeDocuments();
+    console.log("Docs reçus du backend :", docs);
+  };
+  fetchDocs();
+}, []);
+
+
+  // ========= NORMALISATION DES REFERENCES =========
+  const normalizeRefs = (ref) => {
+    if (Array.isArray(ref)) return ref;
+    if (!ref) return [];
+    return [ref];
+  };
 
   // === HANDLERS ===
   const handleAddClick = () => setShowForm(true);
@@ -47,16 +71,26 @@ export default function SoldesPage() {
   };
 
   const handleSubmit = async (data, mode) => {
+    data.reference = normalizeRefs(data.reference);
+
     if (mode === "update") {
       try {
+        console.log("Mise à jour du document :", data);
         await updateDocument(data.id, data);
+
         setDocuments((prev) =>
-          prev.map((d) => (d.id === data.id ? { ...d, ...data } : d))
+          prev.map((d) =>
+            d.id === data.id
+              ? { ...d, ...data, id: d.id } // 🔥 ID toujours conservé
+              : d
+          )
         );
-        setToast("✅ Document modifié avec succès");
+
+
+        showToast("Document modifié avec succès", "success");
       } catch (err) {
         console.error(err);
-        showToastErr("❌ Impossible de modifier le document");
+        showToastErr("Impossible de modifier le document");
       }
 
       setShowForm(false);
@@ -67,11 +101,17 @@ export default function SoldesPage() {
     // CREATE
     try {
       const docs = await getSoldeDocuments();
-      setDocuments(docs);
-      setToast("✅ Document enregistré avec succès");
+      const cleaned = docs.map((d) => ({
+        ...d,
+        id: d.id || crypto.randomUUID(),
+        reference: normalizeRefs(d.reference),
+      }));
+
+      setDocuments(cleaned);
+      showToast("Document enregistré avec succès", "success");
     } catch (err) {
       console.error(err);
-      showToastErr("❌ Impossible d'enregistrer le document");
+      showToastErr("Impossible d'enregistrer le document");
     }
 
     setShowForm(false);
@@ -79,7 +119,15 @@ export default function SoldesPage() {
 
   const handleUpdate = (docId) => {
     const doc = documents.find((d) => d.id === docId);
-    setSelectedUpdateDoc(doc);
+    console.log("Document à modifier :", doc);
+    const docFixed = {
+      ...doc,
+      reference: normalizeRefs(doc.reference),
+    };
+
+    console.log("Document après normalisation des références :", docFixed);
+
+    setSelectedUpdateDoc(docFixed);
     setShowForm(true);
   };
 
@@ -99,11 +147,10 @@ export default function SoldesPage() {
 
       setDocuments((prev) => prev.filter((d) => d.id !== docId));
 
-      // surtout pas "await showToast()"
       showToast("Document supprimé avec succès", "success");
     } catch (err) {
       console.error(err);
-      showToastErr("❌ Impossible de supprimer le document");
+      showToastErr("Impossible de supprimer le document");
     } finally {
       setDeletingId(null);
     }
@@ -115,17 +162,40 @@ export default function SoldesPage() {
       setLoading(true);
       try {
         const docs = await getSoldeDocuments();
-
-        // sécurité: si Firestore renvoie des docs sans id
         const cleanDocs = docs.map((d) => ({
           ...d,
-          id: d.id || crypto.randomUUID(),
+          reference: normalizeRefs(d.reference),
         }));
 
+        
         setDocuments(cleanDocs);
+
+        console.log(cleanDocs);
+        
+        // Extraction des références
+        let allRefs = [];
+        cleanDocs.forEach((doc) => {
+          const ref = doc.reference;
+          if (!ref) return;
+          if (Array.isArray(ref)) {
+            allRefs.push(...ref);
+          } else {
+            allRefs.push(ref);
+          }
+        });
+
+        allRefs = allRefs
+          .map((r) => (typeof r === "string" ? r.trim() : ""))
+          .filter((r) => r !== "");
+        const uniqueRefs = [...new Set(allRefs)];
+        const formatted = uniqueRefs.map((ref) => ({
+          id: crypto.randomUUID(),
+          label: ref,
+        }));
+        setReferences(formatted);
       } catch (err) {
         console.error(err);
-        showToastErr("❌ Erreur lors du chargement des documents");
+        showToastErr("Erreur lors du chargement des documents");
       } finally {
         setLoading(false);
       }
@@ -133,6 +203,41 @@ export default function SoldesPage() {
 
     fetchDocs();
   }, []);
+
+  // 🔥 DEBOUNCE de la recherche pour enlever le lag
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // === SEARCH FILTER ===
+  useEffect(() => {
+    if (!debouncedSearch) {
+      setFilteredDocs(documents);
+      return;
+    }
+
+    const term = debouncedSearch.toLowerCase();
+
+    setFilteredDocs(
+      documents.filter(
+        (doc) =>
+          doc.nature?.toLowerCase().includes(term) ||
+          (doc.reference || []).some((r) => r.toLowerCase().includes(term)) ||
+          doc.titres?.some((t) =>
+            t.titre?.toLowerCase().includes(term) ||
+            t.pieceType?.toLowerCase().includes(term) ||
+            t.sousTitres?.some((st) =>
+              st.sousTitre?.toLowerCase().includes(term) ||
+              st.pieces?.some((p) => p.toLowerCase().includes(term))
+            )
+          )
+      )
+    );
+  }, [debouncedSearch, documents]);
 
   // === SKELETON ===
   const renderSkeleton = () => (
@@ -149,7 +254,12 @@ export default function SoldesPage() {
           <Box mt={2}>
             <Skeleton variant="text" width="80%" height={20} />
             <Skeleton variant="text" width="70%" height={20} />
-            <Skeleton variant="rectangular" width="100%" height={40} sx={{ mt: 1, borderRadius: 1 }} />
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height={40}
+              sx={{ mt: 1, borderRadius: 1 }}
+            />
           </Box>
           <Stack direction="row" spacing={1} mt={2} justifyContent="flex-end">
             <Skeleton variant="rectangular" width={80} height={30} />
@@ -174,11 +284,12 @@ export default function SoldesPage() {
               </Tooltip>
 
               <Typography variant="h5">
-                {selectedUpdateDoc ? "Modifier un document de solde" : "Nouveau document de solde"}
+                {selectedUpdateDoc
+                  ? "Modifier un document de solde"
+                  : "Nouveau document de solde"}
               </Typography>
             </Stack>
 
-            <Paper elevation={2} sx={{ p: 3 }}>
               <DocumentPage
                 type="solde"
                 references={references}
@@ -186,7 +297,6 @@ export default function SoldesPage() {
                 onCancel={handleCancel}
                 updateDoc={selectedUpdateDoc}
               />
-            </Paper>
           </>
         ) : (
           <>
@@ -217,7 +327,7 @@ export default function SoldesPage() {
               </Paper>
             ) : (
               <Stack spacing={2}>
-                {documents.map((doc) => (
+                {filteredDocs.map((doc) => (
                   <Card key={doc.id} variant="outlined" sx={{ borderRadius: 2 }}>
                     <CardContent>
                       <Stack direction="row" alignItems="center" spacing={2}>
@@ -226,20 +336,33 @@ export default function SoldesPage() {
                       </Stack>
 
                       <Typography variant="body2" color="text.secondary">
-                        <strong>Type :</strong> {doc.pieceType || "—"}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        <strong>Référence :</strong> {doc.reference || "—"}
+                        <strong>Références :</strong>{" "}
+                        {doc.reference?.length > 0
+                          ? doc.reference.join(", ")
+                          : "—"}
                       </Typography>
 
                       {doc.titres?.length > 0 && (
                         <Box mt={2}>
                           {doc.titres.map((t, ti) => (
                             <Box key={ti} mb={1}>
-                              {t.titre && <Typography fontWeight={600}>• {t.titre}</Typography>}
+                              {t.titre && (
+                                <Typography fontWeight={600}>
+                                  • {t.titre}
+                                </Typography>
+                              )}
+
+                              {t.pieceType && (
+                                <Typography variant="body2" color="text.secondary" ml={2}>
+                                  <strong>Type de pièces :</strong> {t.pieceType}
+                                </Typography>
+                              )}
+
                               {t.sousTitres?.map((st, si) => (
                                 <Box key={si} ml={2}>
-                                  {st.sousTitre && <Typography>- {st.sousTitre}</Typography>}
+                                  {st.sousTitre && (
+                                    <Typography>- {st.sousTitre}</Typography>
+                                  )}
                                   {st.pieces?.map((p, pi) => (
                                     <Typography key={pi} variant="body2" ml={3}>
                                       • {p}

@@ -3,23 +3,23 @@ import { useNavigate } from "react-router-dom";
 import BlockIcon from "@mui/icons-material/Block"; // Icône Material UI
 import { Warning } from "@mui/icons-material";
 
-export default function NotFound() {
+export default function NonAutorise() {
   const navigate = useNavigate();
 
   return (
     <div style={styles.page}>
       <div style={styles.card}>
         <div style={styles.iconWrapper}>
-          <Warning  style={styles.icon} />
+          <Warning   style={styles.icon} />
         </div>
-        <h1 style={styles.title}>Page non trouvée</h1>
+        <h1 style={styles.title}>Accès refusé</h1>
         <p style={styles.text}>
-          La page que vous cherchez n'existe pas ou a été déplacée.
+          Votre adresse e-mail n'est pas autorisée à accéder à cette application.
         </p>
         <button
           style={styles.button}
-          onClick={() => navigate("/login")}
-          onMouseOver={(e) => (e.currentTarget.style.background = "#DDE8F0FF")}
+          onClick={() => navigate("/")}
+          onMouseOver={(e) => (e.currentTarget.style.background = "#A1D3F5FF")}
           onMouseOut={(e) => (e.currentTarget.style.background = "#fff")}
         >
           Retour à la page de connexion
@@ -36,7 +36,7 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     minHeight: "100vh",
-    background: "linear-gradient(135deg, #CADEEEFF 0%, #F5F9FFFF 100%)",
+    background: "linear-gradient(135deg, #CADEEEFF 0%, #DEE4F0FF 100%)",
     fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
     color: "#fff",
     padding: "20px",
@@ -55,7 +55,7 @@ const styles = {
     animation: "fadeInCard 0.8s",
   },
   iconWrapper: {
-    background: "linear-gradient(135deg, #CC8787FF 60%, #FA889BFF 100%)",
+    background: "linear-gradient(135deg, #CC8787FF 60%, #D44961FF 100%)",
     borderRadius: "50%",
     width: "70px",
     height: "70px",
@@ -77,8 +77,8 @@ const styles = {
     marginBottom: "16px",
     fontWeight: 700,
     letterSpacing: "0.5px",
-    color: "#0C1E46FF",
-    textShadow: "0 1px 4px #156D5AAA",
+    color: "#46130CFF",
+    textShadow: "0 2px 8px #B91D1DAA",
   },
   text: {
     fontSize: "17px",

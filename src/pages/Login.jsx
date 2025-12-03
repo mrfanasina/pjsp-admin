@@ -1,38 +1,75 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, provider } from "../firebase";
+import { auth, provider, db } from "../firebase";
 import { signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
-import { useAuth } from "../contexts/AuthContext"; // <-- contexte global
+import { doc, getDoc } from "firebase/firestore";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { setUser } = useAuth(); // récupération du setter du contexte
+  const { setUser } = useAuth();
 
-  // 🔹 Connexion Google avec Popup
+  const [loadingGoogle, setLoadingGoogle] = useState(false);
+  const [loadingEmail, setLoadingEmail] = useState(false);
+
+  // Vérifie si l'email est dans allowedEmails
+  const checkAllowed = async (email) => {
+    const docRef = doc(db, "allowedEmails", email);
+    const docSnap = await getDoc(docRef);
+    return docSnap.exists();
+  };
+
+  // Connexion Google
   const connexionGooglePopup = async () => {
     try {
+      setLoadingGoogle(true);
       const result = await signInWithPopup(auth, provider);
-      setUser(result.user); // mise à jour du contexte global
-      console.log("Connecté avec Google :", result.user.email);
-      navigate("/home");
+
+      const email = result.user.email;
+      const allowed = await checkAllowed(email);
+
+      if (!allowed) {
+        await auth.signOut();
+        navigate("/non-autorise");
+        return;
+      }
+
+      setUser(result.user);
+      navigate("/pjsp/dashboard");
+
     } catch (error) {
       console.error("Erreur Google popup :", error);
       alert(error.message);
+    } finally {
+      setLoadingGoogle(false);
     }
   };
 
-  // 🔹 Connexion email/mot de passe
+  // Connexion Email/Password
   const connexionEmail = async (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const motDePasse = e.target.motDePasse.value;
+
     try {
+      setLoadingEmail(true);
       const result = await signInWithEmailAndPassword(auth, email, motDePasse);
-      setUser(result.user); // mise à jour du contexte global
-      console.log("Connecté avec email :", result.user.email);
-      navigate("/home");
-    } catch (erreur) {
-      alert("Erreur : " + erreur.message);
+
+      const allowed = await checkAllowed(email);
+      if (!allowed) {
+        await auth.signOut();
+        navigate("/non-autorise");
+        return;
+      }
+
+      setUser(result.user);
+      navigate("/pjsp/dashboard");
+
+    } catch (error) {
+      console.error(error);
+      alert("Erreur : " + error.message);
+    } finally {
+      setLoadingEmail(false);
     }
   };
 
@@ -41,17 +78,32 @@ export default function Login() {
       <div style={styles.card}>
         <h2 style={styles.title}>Se connecter</h2>
 
-        <button style={styles.googleBtn} onClick={connexionGooglePopup}>
-          <img
-            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-            alt="Google logo"
-            style={styles.googleLogo}
-          />
-          <span>Se connecter avec Google</span>
+        {/* Bouton Google */}
+        <button
+          style={{
+            ...styles.googleBtn,
+            opacity: loadingGoogle ? 0.7 : 1,
+          }}
+          onClick={connexionGooglePopup}
+          disabled={loadingGoogle || loadingEmail}
+        >
+          {loadingGoogle ? (
+            <div className="loader" style={styles.loader}></div>
+          ) : (
+            <>
+              <img
+                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                alt="Google"
+                style={styles.googleLogo}
+              />
+              <span>Se connecter avec Google</span>
+            </>
+          )}
         </button>
 
         <div style={styles.divider}>ou</div>
 
+        {/* Formulaire Email */}
         <form onSubmit={connexionEmail} style={styles.form}>
           <input
             name="email"
@@ -67,8 +119,17 @@ export default function Login() {
             style={styles.input}
             required
           />
-          <button type="submit" style={styles.emailBtn}>
-            Se connecter avec Email
+
+          <button
+            type="submit"
+            style={styles.emailBtn}
+            disabled={loadingEmail || loadingGoogle}
+          >
+            {loadingEmail ? (
+              <div className="loader" style={styles.loaderWhite}></div>
+            ) : (
+              "Se connecter avec Email"
+            )}
           </button>
         </form>
       </div>
@@ -76,73 +137,94 @@ export default function Login() {
   );
 }
 
-// --- Styles centrés ---
 const styles = {
   page: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     minHeight: "100vh",
-    background: "linear-gradient(135deg, #e7eaeeff 0%, #d7dbfcff 100%)",
-    fontFamily: "Arial, sans-serif",
+    background: "linear-gradient(120deg, #D7DBEE, #FEFDFF)",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
   },
   card: {
     backgroundColor: "#fff",
-    padding: "40px 50px",
-    borderRadius: "15px",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+    padding: "50px 40px",
+    borderRadius: "20px",
+    boxShadow: "0 15px 40px rgba(0,0,0,0.15)",
     textAlign: "center",
-    width: "350px",
+    width: "380px",
   },
   title: {
-    marginBottom: "25px",
+    marginBottom: "30px",
     color: "#333",
+    fontWeight: 700,
   },
   googleBtn: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: "10px",
+    gap: "12px",
     backgroundColor: "#fff",
     color: "#444",
     border: "1px solid #ccc",
-    padding: "10px 20px",
-    borderRadius: "8px",
+    padding: "12px 20px",
+    borderRadius: "10px",
     cursor: "pointer",
-    fontSize: "15px",
+    fontSize: "16px",
     width: "100%",
-    transition: "all 0.2s ease-in-out",
   },
   googleLogo: {
-    width: "22px",
-    height: "22px",
+    width: "24px",
+    height: "24px",
   },
   divider: {
-    margin: "20px 0",
+    margin: "25px 0",
     color: "#777",
     fontSize: "14px",
+    fontWeight: 500,
   },
   form: {
     display: "flex",
     flexDirection: "column",
-    gap: "12px",
+    gap: "15px",
   },
   input: {
-    padding: "10px 12px",
-    borderRadius: "6px",
+    padding: "12px 15px",
+    borderRadius: "8px",
     border: "1px solid #ccc",
-    outline: "none",
     width: "100%",
-    fontSize: "14px",
+    fontSize: "15px",
   },
   emailBtn: {
     backgroundColor: "#5563DE",
     color: "white",
     border: "none",
-    padding: "10px 0",
-    borderRadius: "6px",
+    padding: "12px 0",
+    borderRadius: "8px",
     cursor: "pointer",
-    fontSize: "15px",
-    transition: "background 0.2s ease-in-out",
+    fontSize: "16px",
+    fontWeight: 600,
+  },
+
+  // Loader noir (Google)
+  loader: {
+    border: "3px solid #ccc",
+    borderTop: "3px solid #444",
+    borderRadius: "50%",
+    width: "22px",
+    height: "22px",
+    animation: "spin 0.8s linear infinite",
+  },
+
+  // Loader blanc (Email)
+  loaderWhite: {
+    border: "3px solid rgba(255,255,255,0.4)",
+    borderTop: "3px solid #fff",
+    borderRadius: "50%",
+    width: "22px",
+    height: "22px",
+    margin: "auto",
+    animation: "spin 0.8s linear infinite",
   },
 };
+

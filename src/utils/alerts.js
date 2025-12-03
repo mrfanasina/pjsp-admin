@@ -118,3 +118,17 @@ export const showError = (message = 'Une erreur est survenue.', title = 'Erreur'
     color: isDarkMode ? '#fff' : '#000',
   });
 };
+
+export const errorConnectionAlert = async (isDarkMode = false) => {
+  return Swal.fire({
+    toast: true,
+    icon: 'error',
+    timerProgressBar: true,
+    title: "Impossible de se connecter au serveur. Veuillez vérifier votre connexion Internet et réessayer.",
+    showConfirmButton: false,
+    position: 'bottom-left',
+    timer: 4000,
+    background: isDarkMode ? '#1f1f1f' : '#fff',
+    color: isDarkMode ? '#fff' : '#000',
+  });
+}

@@ -1,0 +1,527 @@
+[
+  {
+    "n_nature": 1,
+    "libelle_nature": "Nomination HEE non fonctionnaire\n permanent",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 2,
+    "libelle_nature": "Nomination d'un fonctionnaire",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 3,
+    "libelle_nature": "Recrutement d'un EFA",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 4,
+    "libelle_nature": "Recrutement d'un ELD",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 5,
+    "libelle_nature": "Nomination HEE fonctionnaire permanent",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 6,
+    "libelle_nature": "Nomination HEE fonctionnaire non permanent",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 7,
+    "libelle_nature": "Integration",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 8,
+    "libelle_nature": "Titularisation",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 9,
+    "libelle_nature": "Avacement de classe",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 10,
+    "libelle_nature": "Avancement d'echelon",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 11,
+    "libelle_nature": "Reclassement indiciaire",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 12,
+    "libelle_nature": "Majoration indiciaire",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 13,
+    "libelle_nature": "Congés annuels cumulés",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 14,
+    "libelle_nature": "Congé de maladie",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 15,
+    "libelle_nature": "Congé de longue durée",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 16,
+    "libelle_nature": "Congé de cure thermale",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 17,
+    "libelle_nature": "Congé de maternité",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 18,
+    "libelle_nature": "Congé pour formation",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 19,
+    "libelle_nature": "Reclassement d'un fonctionnaire",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 20,
+    "libelle_nature": "Avenant (EFA)",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 21,
+    "libelle_nature": "Ajoration d'indice d'un ELD",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 22,
+    "libelle_nature": "Renouvellement de contrat",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 23,
+    "libelle_nature": "Annulation du contrat de travail",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 24,
+    "libelle_nature": "Annulation d'avenant",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 25,
+    "libelle_nature": "Indemnité compensatrice\n se congé non pris",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 26,
+    "libelle_nature": "Affectation d'un fonctionnaire/EFA/ELD",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 27,
+    "libelle_nature": "En detachement",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 28,
+    "libelle_nature": "En disponibilité sans solde",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 29,
+    "libelle_nature": "Reintegration après suspension de fonction",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 30,
+    "libelle_nature": "Mis à la disposition de la FOP",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 31,
+    "libelle_nature": "Retablissement de la solde",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 32,
+    "libelle_nature": "Reintegration après service militaire",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 33,
+    "libelle_nature": "Reintegration après disponibilité",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 34,
+    "libelle_nature": "Reintegration après suspension de solde/ou de fonction",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 35,
+    "libelle_nature": "Position d'abscence sans solde",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 36,
+    "libelle_nature": "Sanction disciplinaire",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 37,
+    "libelle_nature": "Abrogation de la decision d'abscence sans solde",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 38,
+    "libelle_nature": "Maintient en activité",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 39,
+    "libelle_nature": "Supension de solde",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 40,
+    "libelle_nature": "Suspensioin de fonction",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 41,
+    "libelle_nature": "Revocation avec droits à pensions",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 42,
+    "libelle_nature": "Revocation sans droits à pensions",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 43,
+    "libelle_nature": "Resiliation de contrat de travail ou abrogation décision d'engagement",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 44,
+    "libelle_nature": "Reduction d'ancienneté",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 45,
+    "libelle_nature": "Abaissement d'echelon",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 46,
+    "libelle_nature": "Retrogradation",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 47,
+    "libelle_nature": "Redoublement de stage",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 48,
+    "libelle_nature": "Redoublement d'echelon ou radiation au tableau des avancements de classe",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 49,
+    "libelle_nature": "Dèces",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 50,
+    "libelle_nature": "Demission",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 51,
+    "libelle_nature": "Retraite pour limite d'age",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 52,
+    "libelle_nature": "Radiation du contrôle des effectifs",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 53,
+    "libelle_nature": "Retraite anticipée",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 54,
+    "libelle_nature": "Opposition credit",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 55,
+    "libelle_nature": "Retraite d'office",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 56,
+    "libelle_nature": "Abrogation des HEE non fonctionnaires permanents ou non permanents",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 57,
+    "libelle_nature": "Annulation de code rubrique",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 58,
+    "libelle_nature": "Abrogations HEE fonctionnaires",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 59,
+    "libelle_nature": "Indemnité d'installation",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 60,
+    "libelle_nature": "Attribution de bonification d'ancienneté pour diplomé",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 61,
+    "libelle_nature": "Attribution de bonification d'ancienneté à titre exceptionnel",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 62,
+    "libelle_nature": "Rappel d'ancienneté pour services militaires",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 63,
+    "libelle_nature": "Rectificatif à l'arrêté",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 64,
+    "libelle_nature": "Rectificatif à la décision",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 65,
+    "libelle_nature": "Autorisation de depart en stage à l'exterieur ",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 66,
+    "libelle_nature": "Révision de situation administrative",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 67,
+    "libelle_nature": "Diverses indemnités",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 68,
+    "libelle_nature": "Diverses retenues",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 69,
+    "libelle_nature": "Avance sur solde (rappel de solde)",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 70,
+    "libelle_nature": "Reversement differentiel de trop perçu ",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 71,
+    "libelle_nature": "Cession volontaire opposition sur salaire et pension alimentaire",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 72,
+    "libelle_nature": "Reversement trop perçu",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 73,
+    "libelle_nature": "Regularisation indemnités moins perçue",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 74,
+    "libelle_nature": "Rappel differentiel moins perçu",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 75,
+    "libelle_nature": "Changement mode de paiement",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 76,
+    "libelle_nature": "Création de code rubrique",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 77,
+    "libelle_nature": "Modification code rubrique",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 78,
+    "libelle_nature": "Attribution numéro matricule d'une élève fonctionnaire",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 79,
+    "libelle_nature": "Insertion rubrique affectation d'un fonctionnaire à l'exterieur",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 80,
+    "libelle_nature": "Diverse modification ou rectification de nom ou modification date d'effet",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 81,
+    "libelle_nature": "Declassement",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 82,
+    "libelle_nature": "Validation",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 83,
+    "libelle_nature": "Exclusion temporaire",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 84,
+    "libelle_nature": "Suppelement familial(allocations familliales)",
+    "n_typedocument": 1
+  },
+  {
+    "n_nature": 85,
+    "libelle_nature": "Dernier arrérage",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 86,
+    "libelle_nature": "Secours aux decès",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 87,
+    "libelle_nature": "Pension alimentaire",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 88,
+    "libelle_nature": "Transfert et rembourssement des cotisations",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 89,
+    "libelle_nature": "Debet comptable cession volontaire",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 90,
+    "libelle_nature": "Concession pension agent",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 91,
+    "libelle_nature": "Concession pension de veuvage",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 92,
+    "libelle_nature": "Concession pension d'orphelinat",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 93,
+    "libelle_nature": "Concession de rente d'invalidité ",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 94,
+    "libelle_nature": "Revision de pension: indice",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 95,
+    "libelle_nature": "Revision de pension: Ordre National",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 96,
+    "libelle_nature": "Revision de pension: Majoration pour enfants",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 97,
+    "libelle_nature": "Revision de pension: Prestation familiale",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 98,
+    "libelle_nature": "Revision de pension: (Validation gracieuse)",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 99,
+    "libelle_nature": "Revision de pension: changement d'assignation",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 100,
+    "libelle_nature": "Reversion de pensioné la veuve",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 101,
+    "libelle_nature": "Reversion de pension aux orphelins ",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 102,
+    "libelle_nature": "Reversion de pension aux orphelins infirmes",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 103,
+    "libelle_nature": "Regularisation: Remandatement",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 104,
+    "libelle_nature": "Regularisation: Pension Temporaire d'Orphelinat",
+    "n_typedocument": 2
+  },
+  {
+    "n_nature": 105,
+    "libelle_nature": "Pecule de reforme",
+    "n_typedocument": 2
+  }
+]
