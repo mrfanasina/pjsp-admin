@@ -21,43 +21,41 @@ const Header = ({ title }) => {
   if (!user) return null;
 
   return (
-    <header className="flex items-center justify-between bg-white h-18 px-6 border-b border-gray-200 shadow-sm">
-      {/* Titre à gauche */}
-      <h1 className="text-xl font-semibold text-gray-800 tracking-tight">
-        {title}
-      </h1>
+<header className="flex items-center bg-white h-18 px-6 border-b border-gray-200 shadow-sm">
+  {/* Titre à gauche */}
+  <h1 className="text-xl font-semibold text-gray-800 tracking-tight">
+    {title}
+  </h1>
 
-      {/* Recherche au centre */}
-      <div className="flex-1 max-w-lg mx-6">
-        <div className="relative group max-w-80">
-          <Search
-            size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors"
-          />
+  {/* Recherche à droite */}
+  <div className="ml-auto">
+    <div className="relative group max-w-80">
+      <Search
+        size={18}
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors"
+      />
 
-          <input
-            type="text"
-            placeholder="Rechercher..."
-            value={localValue}
-            onChange={(e) => setLocalValue(e.target.value)}
-            className="
-              w-full pl-10 pr-3 py-2
-              rounded-lg border border-gray-300
-              focus:outline-none
-              focus:ring-2 focus:ring-blue-400
-              focus:border-transparent
-              transition-all
-              placeholder:text-gray-400
-              text-gray-700
-              bg-white/80
-            "
-          />
-        </div>
-      </div>
+      <input
+        type="text"
+        placeholder="Rechercher..."
+        value={localValue}
+        onChange={(e) => setLocalValue(e.target.value)}
+        className="
+          w-80 pl-10 pr-3 py-2
+          rounded-lg border border-gray-300
+          focus:outline-none
+          focus:ring-2 focus:ring-blue-400
+          focus:border-transparent
+          transition-all
+          placeholder:text-gray-400
+          text-gray-700
+          bg-white/80
+        "
+      />
+    </div>
+  </div>
+</header>
 
-      {/* Espace vide pour symétrie (garde un header équilibré) */}
-      <div className="w-10"></div>
-    </header>
   );
 };
 

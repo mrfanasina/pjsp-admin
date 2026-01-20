@@ -14,6 +14,9 @@ import DashboardHome from '../pages/DashboardHome';
 
 import { useHeaderVisibility } from '../contexts/HeaderVisibilityContext';
 
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebase';
+
 const routeTitles = {
   '/pjsp/dashboard': 'Tableau de bord',
   '/pjsp/soldes': 'Soldes',
@@ -26,22 +29,31 @@ const routeTitles = {
 
 const PJSPDashboardLayout = () => {
   const { user, setUser } = useAuth();
-  const { showHeader } = useHeaderVisibility(); // 👈 récupère l'état du Header
+  const { showHeader } = useHeaderVisibility();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
 
   const location = useLocation();
 
+  // 🔒 Protection
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('currentUser');
-    sessionStorage.removeItem('authToken');
-    sessionStorage.removeItem('currentUser');
-    setUser(null);
-    window.location.href = '/login';
+  // 🔴 Déconnexion (même principe, mais Firebase propre)
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // 🔥 déconnexion Firebase réelle
+
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('currentUser');
+      sessionStorage.removeItem('authToken');
+      sessionStorage.removeItem('currentUser');
+
+      setUser(null);
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion :', error);
+    }
   };
 
   const headerTitle = routeTitles[location.pathname] || '';
@@ -63,7 +75,7 @@ const PJSPDashboardLayout = () => {
         }`}
       >
 
-        {/* HEADER (affiché seulement si showHeader = true) */}
+        {/* HEADER */}
         {showHeader && (
           <Header
             title={headerTitle}
@@ -73,7 +85,7 @@ const PJSPDashboardLayout = () => {
           />
         )}
 
-        {/* MAIN CONTENT */}
+        {/* MAIN */}
         <main className="p-6 flex-1 overflow-auto">
           <Routes>
             <Route path="dashboard" element={<DashboardHome />} />
@@ -84,6 +96,7 @@ const PJSPDashboardLayout = () => {
             <Route path="messages" element={<MessagePage />} />
             <Route path="*" element={<DashboardHome />} />
           </Routes>
+
           <Outlet />
         </main>
       </div>

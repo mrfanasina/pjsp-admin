@@ -30,6 +30,7 @@ import {
 
 import { Pie, Bar } from "react-chartjs-2";
 import { useNavigate } from "react-router-dom";
+import { SupervisedUserCircle } from "@mui/icons-material";
 
 ChartJS.register(
     ArcElement,
@@ -185,7 +186,7 @@ export default function DashboardHome() {
 
 
     return (
-        <Box px={2} py={5} sx={{ minHeight: '100vh' }}>
+        <Box px={2} py={5} sx={{ mt: 0,minHeight: '100vh' }}>
 
             {/* --------------------------------------------- */}
             {/* SUMMARY CARDS — fullwidth responsive fluid */}
@@ -193,8 +194,9 @@ export default function DashboardHome() {
             <Box
                 sx={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))",
                     gap: 2,
+                    mt: 0,
                     mb: 4
                 }}
             >
@@ -223,6 +225,14 @@ export default function DashboardHome() {
                     icon={MessageIcon}
                     iconColor={colors.messages}
                     linkPath="/pjsp/messages"
+                />
+                <SummaryCard
+                    navigate={navigate}
+                    label="Services"
+                    value={counts.services}
+                    icon={SupervisedUserCircle}
+                    iconColor={colors.services}
+                    linkPath="/pjsp/services"
                 />
             </Box>
 

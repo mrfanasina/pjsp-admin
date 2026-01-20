@@ -156,15 +156,6 @@ export default function MessagePage() {
 
   return (
     <Box sx={{ p: 3, maxWidth: 1200, mx: "auto" }}>
-      
-      {/* 🔵 TITRE PRINCIPAL */}
-      <Stack direction="row" alignItems="center" spacing={1} mb={1}>
-        <Mail size={28} />
-        <Typography variant="h4" fontWeight="bold">
-          Messages reçus
-        </Typography>
-      </Stack>
-
       {/* SECTION EMAIL */}
       <Paper sx={{ p: 3, mb: 4 }}>
         <Stack direction="row" alignItems="center" spacing={1} mb={1}>

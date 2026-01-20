@@ -1,72 +1,95 @@
-import React, { useState } from 'react';
-import { Outlet, Navigate, useLocation, Routes, Route } from 'react-router-dom';
-import Sidebar from './Sidebar';
-import Header from './Sidebar';
-import { useUser } from '../contexts/AuthContext';
-import SoldesPage from '../pages/SoldesPage';
-import PensionsPage from '../pages/PensionsPages';
-import ArticlesPage from '../pages/ArticlesPage';
-import ServicesPage from '../pages/ServicesPage';
-import ParametresPage from '../pages/ParametresPage';
-import MessagePage from '../pages/MessagePage';
-import DashboardHome from '../pages/DashboardHome';
+import React, { useState } from "react";
+import { Outlet, Navigate, useLocation, Routes, Route, useNavigate } from "react-router-dom";
+import Sidebar from "./Sidebar";
+import Header from "./Header";
+import { useUser } from "../contexts/AuthContext";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase";
+
+import SoldesPage from "../pages/SoldesPage";
+import PensionsPage from "../pages/PensionsPages";
+import ArticlesPage from "../pages/ArticlesPage";
+import ServicesPage from "../pages/ServicesPage";
+import ParametresPage from "../pages/ParametresPage";
+import MessagePage from "../pages/MessagePage";
+import DashboardHome from "../pages/DashboardHome";
 
 const routeTitles = {
-'/pjsp/dashboard': 'Accueil',
-'/pjsp/soldes': 'Soldes',
-'/pjsp/pensions': 'Pensions',
-'/pjsp/articles': 'Articles',
-'/pjsp/services': 'Services',
-'/pjsp/parametres': 'Paramètres',
-'/pjsp/messages': 'Messages',
+  "/pjsp/dashboard": "Accueil",
+  "/pjsp/soldes": "Soldes",
+  "/pjsp/pensions": "Pensions",
+  "/pjsp/articles": "Articles",
+  "/pjsp/services": "Services",
+  "/pjsp/parametres": "Paramètres",
+  "/pjsp/messages": "Messages",
 };
 
 const PJSPDashboardLayout = () => {
-const { user, setUser } = useUser();
-const [isSidebarOpen, setSidebarOpen] = useState(true);
-const location = useLocation();
+  const { user, setUser } = useUser();
+  const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-if (!user) {
-return <Navigate to="/login" replace />;
-}
+  // 🔒 Protection : si non connecté
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
-const handleLogout = () => {
-localStorage.removeItem('authToken');
-localStorage.removeItem('currentUser');
-sessionStorage.removeItem('authToken');
-sessionStorage.removeItem('currentUser');
-setUser(null);
-window.location.href = '/login';
-};
+  // 🔴 Déconnexion Firebase
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
 
-const headerTitle = routeTitles[location.pathname] || '';
+      // Nettoyage local (optionnel mais propre)
+      localStorage.clear();
+      sessionStorage.clear();
 
-return ( <div className="flex h-screen overflow-hidden">
-<Sidebar
-isOpen={isSidebarOpen}
-onToggle={() => setSidebarOpen(prev => !prev)}
-onLogout={handleLogout}
-/>
-<div
-className={`flex flex-col flex-1 bg-gray-100 transition-all duration-300 ${
-          isSidebarOpen ? 'md:ml-64' : 'md:ml-20'
+      setUser(null);
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("Erreur de déconnexion :", error);
+    }
+  };
+
+  const headerTitle = routeTitles[location.pathname] || "";
+
+  return (
+    <div className="flex h-screen overflow-hidden">
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onToggle={() => setSidebarOpen((prev) => !prev)}
+        onLogout={handleLogout}
+      />
+
+      <div
+        className={`flex flex-col flex-1 bg-gray-100 transition-all duration-300 ${
+          isSidebarOpen ? "md:ml-64" : "md:ml-20"
         }`}
->
-<Header
-title={headerTitle}
-user={user}
-onToggleSidebar={() => setSidebarOpen(prev => !prev)}
-onLogout={handleLogout}
-/> <main className="p-6 flex-1 overflow-auto"> <Routes>
-<Route path="dashboard" element={<DashboardHome />} />
-<Route path="soldes" element={<SoldesPage />} />
-<Route path="pensions" element={<PensionsPage />} />
-<Route path="articles" element={<ArticlesPage />} />
-<Route path="services" element={<ServicesPage />} />
-<Route path="parametres" element={<ParametresPage />} />
-<Route path="messages" element={<MessagePage />} />
-<Route path="*" element={<DashboardHome />} /> </Routes> <Outlet /> </main> </div> </div>
-);
+      >
+        <Header
+          title={headerTitle}
+          user={user}
+          onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
+          onLogout={handleLogout}
+        />
+
+        <main className="p-6 flex-1 overflow-auto">
+          <Routes>
+            <Route path="dashboard" element={<DashboardHome />} />
+            <Route path="soldes" element={<SoldesPage />} />
+            <Route path="pensions" element={<PensionsPage />} />
+            <Route path="articles" element={<ArticlesPage />} />
+            <Route path="services" element={<ServicesPage />} />
+            <Route path="parametres" element={<ParametresPage />} />
+            <Route path="messages" element={<MessagePage />} />
+            <Route path="*" element={<DashboardHome />} />
+          </Routes>
+
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
 };
 
 export default PJSPDashboardLayout;

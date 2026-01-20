@@ -3,6 +3,9 @@ import { NavLink } from 'react-router-dom';
 import { Home, Users, Calendar, Settings, FileText, DollarSign, MessageCircle, ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Dashboard, Person } from '@mui/icons-material';
+import logo from '../assets/PJSP-1.png';
+
+// Menu items configuration
 
 const menuItems = [
   { to: '/pjsp/dashboard', icon: <Dashboard />, label: 'Tableau de bord' },
@@ -25,7 +28,12 @@ const Sidebar = ({ isOpen, onToggle, onLogout }) => {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200 shadow-sm">
         {isOpen && (
-          <h1 className="text-xl font-bold text-gray-700 break-words">PJSP-ADMIN</h1>
+          <>
+            <img src={logo} alt="Logo" className="w-10 h-10 rounded" />
+            <h1 className="text-lg font-semibold text-gray-800">
+              PJSP Admin
+            </h1>
+          </>
         )}
         <button onClick={onToggle} className="p-2 rounded hover:bg-gray-100 transition">
           {isOpen ? <ChevronLeft /> : <ChevronRight />}

@@ -65,7 +65,6 @@ export async function deleteUserEmail(email) {
   if (methods.includes("password")) {
     // Nécessite que l'utilisateur soit connecté ou via Admin SDK
     // Ici on ne peut pas supprimer un user Auth côté client pour un autre utilisateur
-    // Tu devrais utiliser Firebase Admin SDK côté serveur pour supprimer
     console.warn("Suppression Auth côté client impossible pour un autre utilisateur");
   }
 
